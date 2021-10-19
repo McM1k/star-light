@@ -30,6 +30,7 @@ mod main_tests {
         assert_eq!(answer, 2);
     }
 
+    #[test]
     fn example_2() {
         let start = String::from("101010");
         let target = String::from("010101");
@@ -37,6 +38,7 @@ mod main_tests {
         assert_eq!(answer, 26);
     }
 
+    #[test]
     fn example_3() {
         let start = String::from("11001001000");
         let target = String::from("10000110011");
