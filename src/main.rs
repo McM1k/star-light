@@ -68,7 +68,16 @@ fn rule_check(current_state: &Vec<u8>, pos: usize) -> bool {
 
 #[cfg(test)]
 mod main_tests {
-    use crate::{rule_check, solve};
+    use crate::{rule_check, solve, parse_inputs};
+
+    #[test]
+    fn parse_inputs_example_1() {
+        let start_line = "1101".to_string();
+        let target_line = "0010".to_string();
+        let (start, target) = parse_inputs(start_line, target_line).unwrap();
+        assert_eq!(start, vec![1,1,0,1]);
+        assert_eq!(target, vec![0,0,1,0]);
+    }
 
     #[test]
     fn rule_check_example_1() {
