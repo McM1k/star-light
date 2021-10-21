@@ -1,9 +1,11 @@
-use std::io;
-use anyhow::{Result, bail};
+use anyhow::{bail, Result};
 use log::debug;
+use std::io;
 
 macro_rules! parse_input {
-    ($x:expr, $t:ident) => ($x.trim().parse::<$t>().unwrap())
+    ($x:expr, $t:ident) => {
+        $x.trim().parse::<$t>().unwrap()
+    };
 }
 
 fn main() {
@@ -19,7 +21,7 @@ fn main() {
         Err(e) => {
             println!("Error: {}", e);
             return;
-        },
+        }
     };
 
     let answer = solve(&mut start.clone(), target.clone(), 0);
@@ -53,7 +55,7 @@ fn solve(state: &mut Vec<u8>, target: Vec<u8>, pos: usize) -> usize {
     for i in pos..state.len() {
         if state[i] != target[i] {
             if !rule_check(&state, i) {
-                score += solve(state, new_target(i, state.len()), i+1);
+                score += solve(state, new_target(i, state.len()), i + 1);
             }
             score += 1;
             state[i] = bit_switch(state[i]);
@@ -100,20 +102,20 @@ fn rule_check(current_state: &Vec<u8>, pos: usize) -> bool {
 
 #[cfg(test)]
 mod main_tests {
-    use crate::{rule_check, solve, parse_inputs};
+    use crate::{parse_inputs, rule_check, solve};
 
     #[test]
     fn parse_inputs_example_1() {
         let start_line = "1101".to_string();
         let target_line = "0010".to_string();
         let (start, target) = parse_inputs(start_line, target_line).unwrap();
-        assert_eq!(start, vec![1,1,0,1]);
-        assert_eq!(target, vec![0,0,1,0]);
+        assert_eq!(start, vec![1, 1, 0, 1]);
+        assert_eq!(target, vec![0, 0, 1, 0]);
     }
 
     #[test]
     fn rule_check_example_1() {
-        let state = vec![1,1,0,1];
+        let state = vec![1, 1, 0, 1];
         assert_eq!(rule_check(&state, 0), false);
         assert_eq!(rule_check(&state, 1), false);
         assert_eq!(rule_check(&state, 2), true);
@@ -122,24 +124,24 @@ mod main_tests {
 
     #[test]
     fn solve_example_1() {
-        let start = vec![1,1,0,1];
-        let target = vec![0,1,0,0];
+        let start = vec![1, 1, 0, 1];
+        let target = vec![0, 1, 0, 0];
         let answer = solve(&mut start.clone(), target, 0);
         assert_eq!(answer, 2);
     }
 
     #[test]
     fn solve_example_2() {
-        let start = vec![1,0,1,0,1,0];
-        let target = vec![0,1,0,1,0,1];
+        let start = vec![1, 0, 1, 0, 1, 0];
+        let target = vec![0, 1, 0, 1, 0, 1];
         let answer = solve(&mut start.clone(), target, 0);
         assert_eq!(answer, 26);
     }
 
     #[test]
     fn solve_example_3() {
-        let start = vec![1,1,0,0,1,0,0,1,0,0,0];
-        let target = vec![1,0,0,0,0,1,1,0,0,1,1];
+        let start = vec![1, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0];
+        let target = vec![1, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1];
         let answer = solve(&mut start.clone(), target, 0);
         assert_eq!(answer, 877);
     }
