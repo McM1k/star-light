@@ -1,11 +1,13 @@
 use std::io;
 use anyhow::{Result, bail};
+use log::debug;
 
 macro_rules! parse_input {
     ($x:expr, $t:ident) => ($x.trim().parse::<$t>().unwrap())
 }
 
 fn main() {
+    env_logger::init();
     let mut input_line = String::new();
     io::stdin().read_line(&mut input_line).unwrap();
     let start_line = input_line.trim_end().to_string();
@@ -20,8 +22,8 @@ fn main() {
         },
     };
 
-    let answer = solve(start.clone(), target.clone());
-    println!("start: {:?} \ntarget: {:?} \nanswer: {}", start, target, answer);
+    let answer = solve(&mut start.clone(), target.clone(), 0);
+    println!("{}", answer);
 }
 
 fn parse_inputs(start_line: String, target_line: String) -> Result<(Vec<u8>, Vec<u8>)> {
@@ -44,8 +46,38 @@ fn parse_inputs(start_line: String, target_line: String) -> Result<(Vec<u8>, Vec
     Ok((start, target))
 }
 
-fn solve(start: Vec<u8>, target: Vec<u8>) -> usize {
-    0
+fn solve(state: &mut Vec<u8>, target: Vec<u8>, pos: usize) -> usize {
+    let mut score = 0;
+    debug!("state:{:?}, target:{:?}, pos:{}", state, target, pos);
+
+    for i in pos..state.len() {
+        if state[i] != target[i] {
+            if !rule_check(&state, i) {
+                score += solve(state, new_target(i, state.len()), i+1);
+            }
+            score += 1;
+            state[i] = bit_switch(state[i]);
+            debug!("state changed to {:?}", state);
+        }
+    }
+
+    score
+}
+
+fn bit_switch(bit: u8) -> u8 {
+    match bit {
+        0 => 1,
+        _ => 0,
+    }
+}
+
+fn new_target(bit_of_interest: usize, len: usize) -> Vec<u8> {
+    let mut target = vec![0_u8; len];
+    if bit_of_interest < len - 1 {
+        target[bit_of_interest + 1] = 1;
+    }
+
+    target
 }
 
 fn rule_check(current_state: &Vec<u8>, pos: usize) -> bool {
@@ -91,8 +123,8 @@ mod main_tests {
     #[test]
     fn solve_example_1() {
         let start = vec![1,1,0,1];
-        let target = vec![0,0,1,0];
-        let answer = solve(start, target);
+        let target = vec![0,1,0,0];
+        let answer = solve(&mut start.clone(), target, 0);
         assert_eq!(answer, 2);
     }
 
@@ -100,7 +132,7 @@ mod main_tests {
     fn solve_example_2() {
         let start = vec![1,0,1,0,1,0];
         let target = vec![0,1,0,1,0,1];
-        let answer = solve(start, target);
+        let answer = solve(&mut start.clone(), target, 0);
         assert_eq!(answer, 26);
     }
 
@@ -108,7 +140,7 @@ mod main_tests {
     fn solve_example_3() {
         let start = vec![1,1,0,0,1,0,0,1,0,0,0];
         let target = vec![1,0,0,0,0,1,1,0,0,1,1];
-        let answer = solve(start, target);
+        let answer = solve(&mut start.clone(), target, 0);
         assert_eq!(answer, 877);
     }
 }
